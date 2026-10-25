@@ -683,8 +683,12 @@ For a complete list of features and their implementation status, see [MISSING_FE
 
 ## License
 
-`SwiftMath` is available under the MIT license. See the [LICENSE](./LICENSE)
-file for more info.
+The original `SwiftMath` code is available under the MIT license.
+
+[`MTMathRenderer.swift`](Sources/SwiftMath/MathRender/MTMathRenderer.swift)
+is derived from [Telegram iOS](https://github.com/TelegramMessenger/Telegram-iOS)
+and licensed under GNU GPL v. 2 or later. Distribution incorporating this renderer
+is subject to GPL terms. See [LICENSE](./LICENSE) for both licenses.
 
 ### Fonts
 This distribution contains Latin Modern Math, licensed under the

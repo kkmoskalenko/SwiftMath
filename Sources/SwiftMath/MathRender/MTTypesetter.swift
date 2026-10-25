@@ -63,8 +63,9 @@ func getInterElementSpaceArrayIndexForType(_ type:MTMathAtomType, row:Bool) -> I
             return 5;
         case .punctuation:
             return 6;
-        case .fraction,  // Fraction and inner are treated the same.
-             .inner:
+        case .fraction,  // Fraction, inner and table are treated the same.
+             .inner,
+             .table:
             return 7;
         case .radical:
             if row {
@@ -83,7 +84,7 @@ func getInterElementSpaceArrayIndexForType(_ type:MTMathAtomType, row:Bool) -> I
         case .accent, .underline, .overline:
             return 0
         // Special types that don't typically participate in spacing are treated as ordinary
-        case .boundary, .space, .style, .table:
+        case .boundary, .space, .style:
             return 0
     }
 }
@@ -596,8 +597,14 @@ class MTTypesetter {
         let spaceArray = getInterElementSpaces()[Int(leftIndex)]
         let spaceTypeObj = spaceArray[Int(rightIndex)]
         let spaceType = spaceTypeObj
-        assert(spaceType != .invalid, "Invalid space between \(left) and \(right)")
-        
+        // An "invalid" adjacency (e.g. a Relation immediately followed by a
+        // Binary Operator, as in `x = -1`) is a valid math list that simply has
+        // no defined inter-element spacing. Render it with zero spacing instead
+        // of trapping: the previous `assert(spaceType != .invalid, ...)` crashed
+        // debug builds on perfectly valid equations, while release builds (where
+        // assertions are compiled out) already fell through to `return 0`.
+        if spaceType == .invalid { return 0 }
+
         let spaceMultipler = self.getSpacingInMu(spaceType)
         if spaceMultipler > 0 {
             // 1 em = size of font in pt. space multipler is in multiples mu or 1/18 em
@@ -737,7 +744,12 @@ class MTTypesetter {
     }
     
     func numeratorGapMin() -> CGFloat {
-        if style == .display {
+        // TeX/KaTeX use the (small) text-style gap min for inline fractions, which
+        // makes the numerator hug the bar. We intentionally use the larger
+        // display-style clearance for text style too, so inline fractions get the
+        // same breathing room as display fractions. The smaller script styles keep
+        // their compact gap so deeply nested fractions are not over-spaced.
+        if style == .display || style == .text {
             return styleFont.mathTable!.fractionNumeratorDisplayStyleGapMin;
         } else {
             return styleFont.mathTable!.fractionNumeratorGapMin;
@@ -761,7 +773,9 @@ class MTTypesetter {
     }
     
     func denominatorGapMin() -> CGFloat {
-        if style == .display {
+        // See numeratorGapMin(): inline (text) fractions use the larger
+        // display-style clearance so the denominator does not hug the bar.
+        if style == .display || style == .text {
             return styleFont.mathTable!.fractionDenominatorDisplayStyleGapMin;
         } else {
             return styleFont.mathTable!.fractionDenominatorGapMin;
@@ -1216,6 +1230,10 @@ class MTTypesetter {
 
         let glyphHeight: CGFloat
 
+        // Typeset the inner content at most once. The resulting display is reused
+        // for both the delimiter height calculation and the placement below.
+        var innerListDisplay: MTMathListDisplay? = nil
+
         // Check if we have an explicit delimiter height (from \big, \Big, etc.)
         if let delimiterMultiplier = inner!.delimiterHeight {
             // delimiterHeight is a multiplier (e.g., 1.2, 1.8, 2.4, 3.0)
@@ -1223,7 +1241,7 @@ class MTTypesetter {
             glyphHeight = styleFont.fontSize * delimiterMultiplier
         } else {
             // Calculate height based on inner content (for \left...\right)
-            let innerListDisplay = MTTypesetter.createLineForMathList(inner!.innerList, font:font, style:style, cramped:cramped, spaced:true, maxWidth:maxWidth)
+            innerListDisplay = MTTypesetter.createLineForMathList(inner!.innerList, font:font, style:style, cramped:cramped, spaced:true, maxWidth:maxWidth)
             let axisHeight = styleFont.mathTable!.axisHeight
             // delta is the max distance from the axis
             let delta = max(innerListDisplay!.ascent - axisHeight, innerListDisplay!.descent + axisHeight);
@@ -1251,12 +1269,13 @@ class MTTypesetter {
         }
 
         // Only include inner content if not using explicit delimiter height
-        // (explicit height commands like \big produce standalone delimiters)
-        if inner!.delimiterHeight == nil {
-            let innerListDisplay = MTTypesetter.createLineForMathList(inner!.innerList, font:font, style:style, cramped:cramped, spaced:true, maxWidth:maxWidth)
-            innerListDisplay!.position = position;
-            position.x += innerListDisplay!.width;
-            innerElements.append(innerListDisplay!)
+        // (explicit height commands like \big produce standalone delimiters).
+        // Reuse the display already typeset for the height calculation above so the
+        // inner list is never typeset twice (see issue #66).
+        if inner!.delimiterHeight == nil, let innerListDisplay {
+            innerListDisplay.position = position;
+            position.x += innerListDisplay.width;
+            innerElements.append(innerListDisplay)
         }
 
         if inner!.rightBoundary != nil && !inner!.rightBoundary!.nucleus.isEmpty {
@@ -1649,12 +1668,15 @@ class MTTypesetter {
                 let minYCompensation = max(0, glyphMinY)
                 height = accentee.ascent + arrowSpacing - minYCompensation
             } else {
-                // Non-stretchy arrows (\vec): use tight spacing like regular accents
-                // This gives a more compact appearance suitable for single-character vectors
-                delta = min(accentee.ascent, mathTable.accentBaseHeight)
-                // Use same formula as regular accents (no minYCompensation adjustment)
-                // This places the arrow properly above the character
-                height = accentee.ascent - delta
+                // Non-stretchy arrows (\vec): place the arrow just above the accentee
+                // (centered, no horizontal scaling). A positive gap above the ascent
+                // prevents the arrow from overlapping the base character — the previous
+                // `ascent - delta` formula collapsed onto the letter for x-height glyphs.
+                delta = 0
+                let arrowSpacing = mathTable.upperLimitGapMin
+                // Compensate for internal glyph whitespace (minY > 0)
+                let minYCompensation = max(0, glyphMinY)
+                height = accentee.ascent + arrowSpacing - minYCompensation
             }
 
             // For stretchy arrow accents (\overrightarrow): if the largest glyph variant is still smaller than content width,

@@ -7,7 +7,7 @@ class RelationOperatorSpacingTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        font = MTFontManager().termesFont(withSize: 20)
+        font = MTFontManager().latinModernFont(withSize: 20)
     }
 
     /// Test that relation operators (=) have proper spacing

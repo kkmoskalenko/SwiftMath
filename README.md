@@ -55,12 +55,7 @@ f(x) = \int\limits_{-\infty}^\infty\!\hat f(\xi)\,e^{2 \pi i \xi x}\,\mathrm{d}\
 
 More examples are included in [EXAMPLES](EXAMPLES.md)
 
-## Fonts
-Here are previews of the included fonts:
 
-![](img/FontsPreview.png#gh-dark-mode-only) 
-![](img/FontsPreviewLight.png#gh-light-mode-only) 
- 
 ## Requirements
 `SwiftMath` works on iOS 11+ or MacOS 12+. It depends
 on the following Apple frameworks:
@@ -591,24 +586,14 @@ The default font-size is 30pt. You can change it as follows:
 label.fontSize = 25
 ```
 ##### Font
-The default font is *Latin Modern Math*. This can be changed as:
+The bundled font is *Latin Modern Math*. To use it at a specific size:
 
 ```swift
-label.font = MTFontManager.fontmanager.termesFont(withSize:20)
+label.font = MTFontManager.manager.latinModernFont(withSize: 20)
 ```
 
-This project has 12 fonts bundled with it, but you can use any OTF math
-font. A python script is included that generates the `.plist` files 
-required for an `.otf` font to work with `SwiftMath`.  If you generate
-(and test) any other fonts please contribute them back to this project for
-others to benefit.
-
-
-
-Note: The `KpMath-Light`, `KpMath-Sans`, `Asana` fonts currently incorrectly
-render very large radicals. It appears that the font files do
-not properly define the offsets required to typeset these glyphs.  If
-anyone can fix this, it would be greatly appreciated.
+The font's `.otf` file and companion `.plist` math metrics are included in
+`Sources/SwiftMath/mathFonts.bundle`.
 
 ##### Text Color
 The default color of the rendered equation is black. You can change
@@ -702,13 +687,5 @@ For a complete list of features and their implementation status, see [MISSING_FE
 file for more info.
 
 ### Fonts
-This distribution contains the following fonts. These fonts are
-licensed as follows:
-* Latin Modern Math: 
-    [GUST Font License](GUST-FONT-LICENSE.txt)
-* Tex Gyre Termes:
-    [GUST Font License](GUST-FONT-LICENSE.txt)
-* [XITS Math](https://github.com/khaledhosny/xits-math):
-    [Open Font License](OFL.txt)
-* [KpMath Light/KpMath Sans](http://scripts.sil.org/OFL):
-    [SIL Open Font License](OFL.txt)
+This distribution contains Latin Modern Math, licensed under the
+[GUST Font License](Sources/SwiftMath/mathFonts.bundle/GUST-FONT-LICENSE.txt).

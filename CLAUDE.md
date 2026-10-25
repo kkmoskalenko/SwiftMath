@@ -99,11 +99,11 @@ ExtendedSwiftMath is a Swift implementation of LaTeX math rendering for iOS (11+
 
 Located in `MathBundle/`:
 
-- **MathFont** (`MathFont.swift`) - Enum of 12 bundled OTF math fonts with thread-safe loading via `BundleManager`
+- **MathFont** (`MathFont.swift`) - Enum for the bundled Latin Modern Math font with thread-safe loading via `BundleManager`
 - **MTFont** (`MathRender/MTFont.swift`) - Font wrapper with math metrics access
 - **MTFontMathTable** (`MathRender/MTFontMathTable.swift`) - Parses OpenType MATH table data from `.plist` files
 
-Each font has a `.otf` file and a companion `.plist` containing math metrics (generated via included Python script).
+The bundled Latin Modern Math font has an `.otf` file and a companion `.plist` containing math metrics.
 
 ### Key Classes
 

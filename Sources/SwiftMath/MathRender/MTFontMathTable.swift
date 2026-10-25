@@ -248,7 +248,7 @@ class MTFontMathTable {
                 // Medium variant list: use second-to-last to avoid extremes
                 targetIndex = count - 2
             } else {
-                // Large variant list (like texgyretermes with 6 variants):
+                // Large variant list:
                 // Use variant at ~60% position to get appropriate display size (~2.0em)
                 // For 7 variants (0-6), this gives index 4
                 targetIndex = min(count - 2, Int(Double(count) * 0.6))

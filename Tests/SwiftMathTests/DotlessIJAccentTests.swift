@@ -10,7 +10,7 @@ final class DotlessIJAccentTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        font = MTFontManager().termesFont(withSize: 20)
+        font = MTFontManager().latinModernFont(withSize: 20)
     }
 
     // MARK: - Accented i Tests
@@ -174,7 +174,7 @@ final class DotlessIJAccentTests: XCTestCase {
         // Test that ĵ renders without crashing
         let latex = "ĵ"
         let mathList = MTMathListBuilder.build(fromString: latex)
-        let font = MTFontManager().termesFont(withSize: 20)
+        let font = MTFontManager().latinModernFont(withSize: 20)
         let display = MTTypesetter.createLineForMathList(mathList, font: font, style: .display)
 
         XCTAssertNotNil(display, "ĵ should render successfully")
@@ -509,7 +509,7 @@ final class DotlessIJAccentTests: XCTestCase {
             XCTAssertEqual(mathList?.atoms.count, 1, "\(char) should produce 1 atom")
 
             // Test rendering - this should not crash
-            let font = MTFontManager().termesFont(withSize: 20)
+            let font = MTFontManager().latinModernFont(withSize: 20)
             let display = MTTypesetter.createLineForMathList(mathList, font: font, style: .display)
             XCTAssertNotNil(display, "\(char) should render without crashing")
         }
@@ -523,7 +523,7 @@ final class DotlessIJAccentTests: XCTestCase {
         XCTAssertNotNil(mathList, "Text with special chars should parse")
 
         // Test rendering - should not crash
-        let font = MTFontManager().termesFont(withSize: 20)
+        let font = MTFontManager().latinModernFont(withSize: 20)
         let display = MTTypesetter.createLineForMathList(mathList, font: font, style: .display)
         XCTAssertNotNil(display, "Special chars in text mode should render")
     }
@@ -551,7 +551,7 @@ final class DotlessIJAccentTests: XCTestCase {
             "Ç", "Ø", "Å", "Æ", "Œ"
         ]
 
-        let font = MTFontManager().termesFont(withSize: 20)
+        let font = MTFontManager().latinModernFont(withSize: 20)
 
         for char in allAccented {
             let mathList = MTMathListBuilder.build(fromString: char)
@@ -573,7 +573,7 @@ final class DotlessIJAccentTests: XCTestCase {
             "ã", "ñ", "õ",
         ]
 
-        let font = MTFontManager().termesFont(withSize: 20)
+        let font = MTFontManager().latinModernFont(withSize: 20)
 
         for char in allAccented {
             let latex = "\\text{\(char)}"

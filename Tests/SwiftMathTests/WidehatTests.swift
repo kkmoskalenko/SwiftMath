@@ -7,7 +7,7 @@ final class WidehatTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        font = MTFontManager().termesFont(withSize: 20)
+        font = MTFontManager().latinModernFont(withSize: 20)
     }
 
     // MARK: - Basic Functionality Tests

@@ -64,7 +64,7 @@ final class LimitOperatorRegressionTests: XCTestCase {
         // Regression test: Subscript should use script-sized font (~70% of base)
         // Bug: Subscript was rendering at full size (not scaled to script style)
         let baseFontSize: CGFloat = 20.0
-        let testFont = try XCTUnwrap(MTFontManager.fontManager.termesFont(withSize: baseFontSize))
+        let testFont = try XCTUnwrap(MTFontManager.fontManager.latinModernFont(withSize: baseFontSize))
 
         let latex = "\\lim_{x\\to\\infty}f(x)"
         let mathList = MTMathListBuilder.build(fromString: latex)
@@ -111,7 +111,7 @@ final class LimitOperatorRegressionTests: XCTestCase {
         // Regression test: Vertical spacing between lim and subscript should match OpenType MATH metrics
         // Bug: Originally had 50% reduction in text mode, making spacing too tight
         let baseFontSize: CGFloat = 20.0
-        let testFont = try XCTUnwrap(MTFontManager.fontManager.termesFont(withSize: baseFontSize))
+        let testFont = try XCTUnwrap(MTFontManager.fontManager.latinModernFont(withSize: baseFontSize))
 
         let latex = "\\lim_{x\\to\\infty}f(x)"
         let mathList = MTMathListBuilder.build(fromString: latex)
@@ -331,7 +331,7 @@ final class LimitOperatorRegressionTests: XCTestCase {
         // Regression test: Integrals in text mode should be taller than surrounding text
         // Bug: Integrals in inline mode were not higher than f(x)
         let baseFontSize: CGFloat = 20.0
-        let testFont = try XCTUnwrap(MTFontManager.fontManager.termesFont(withSize: baseFontSize))
+        let testFont = try XCTUnwrap(MTFontManager.fontManager.latinModernFont(withSize: baseFontSize))
 
         let latex = "\\int f(x) dx"
         let mathList = MTMathListBuilder.build(fromString: latex)
